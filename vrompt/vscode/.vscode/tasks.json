@@ -3,8 +3,9 @@
   "tasks": [
     {
       "label": "Vrompt: Build Extension",
-      "type": "shell",
-      "command": "npm run build",
+      "type": "process",
+      "command": "npm.cmd",
+      "args": ["run", "build"],
       "problemMatcher": "$tsc",
       "group": {
         "kind": "build",
