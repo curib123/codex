@@ -45,15 +45,31 @@ export function routeModel(context: RoutingContext): RoutingDecision {
     return { taskClass, model, reason: "Manual model selection" };
   }
 
-  const available = MODELS.filter((model) => context.availableProviders.includes(model.provider));
+  const available = MODELS.filter(
+    (model) => context.availableProviders.includes(model.provider) && model.autoEligible !== false,
+  );
   if (available.length === 0) {
     const openai = MODELS.find((model) => model.provider === "openai");
     if (!openai) throw new Error("Vrompt has no fallback model configured.");
     return { taskClass, model: openai, reason: "Fallback to Codex/OpenAI configuration" };
   }
 
+  const freeExact = available.find(
+    (model) => model.costClass === "free-tier" && model.taskClass === taskClass,
+  );
+  if (freeExact) {
+    return { taskClass, model: freeExact, reason: `Auto matched ${taskClass} task on free tier` };
+  }
+
   const exact = available.find((model) => model.taskClass === taskClass);
   if (exact) return { taskClass, model: exact, reason: `Auto matched ${taskClass} task` };
+
+  const freeComplex = available.find(
+    (model) => model.costClass === "free-tier" && model.taskClass === "complex",
+  );
+  if (freeComplex) {
+    return { taskClass, model: freeComplex, reason: "Auto escalated to free-tier complex model" };
+  }
 
   const complex = available.find((model) => model.taskClass === "complex");
   if (complex) return { taskClass, model: complex, reason: "Auto escalated to available complex model" };
