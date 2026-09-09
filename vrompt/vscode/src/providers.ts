@@ -1,9 +1,17 @@
-import type { ProviderId } from "./models";
+import * as vscode from "vscode";
+import type { ModelDefinition, ProviderId } from "./models";
 import { ProviderSecretStore } from "./secrets";
 
 export interface ProviderRuntimeConfig {
   env: NodeJS.ProcessEnv;
   configOverrides: string[];
+  target?: {
+    provider: ProviderId;
+    transport: ModelDefinition["transport"];
+    apiKey: string;
+    baseUrl: string;
+    model: string;
+  };
 }
 
 const PROVIDER_ENV_KEYS: Record<ProviderId, string> = {
@@ -13,18 +21,54 @@ const PROVIDER_ENV_KEYS: Record<ProviderId, string> = {
   zai: "ZAI_API_KEY",
 };
 
+const DEFAULT_BASE_URLS: Record<Exclude<ProviderId, "openai">, string> = {
+  anthropic: "https://api.anthropic.com",
+  mistral: "https://api.mistral.ai/v1",
+  zai: "https://api.z.ai/api/paas/v4",
+};
+
 export async function buildProviderRuntimeConfig(
-  provider: ProviderId,
+  model: ModelDefinition,
   secrets: ProviderSecretStore,
 ): Promise<ProviderRuntimeConfig> {
-  const apiKey = await secrets.get(provider);
+  const apiKey = await secrets.get(model.provider);
   const env: NodeJS.ProcessEnv = {};
-  if (apiKey) env[PROVIDER_ENV_KEYS[provider]] = apiKey;
 
-  // OpenAI is already native in Codex. Third-party provider overrides are added
-  // only once their transport adapters are active; keeping them out here avoids
-  // accidentally routing a chat/messages provider into the Responses endpoint.
-  return { env, configOverrides: [] };
+  if (model.provider === "openai") {
+    if (apiKey) env[PROVIDER_ENV_KEYS.openai] = apiKey;
+    return { env, configOverrides: [] };
+  }
+
+  if (!apiKey) {
+    throw new Error(`${model.displayName} requires an API key. Run “Vrompt: Configure AI Provider”.`);
+  }
+  if (!model.runtimeProvider || !model.runtimeModel) {
+    throw new Error(`${model.displayName} is missing Vrompt runtime metadata.`);
+  }
+
+  const config = vscode.workspace.getConfiguration("vrompt");
+  const baseUrl = config.get<string>(
+    `providers.${model.provider}.baseUrl`,
+    DEFAULT_BASE_URLS[model.provider],
+  );
+  const providerModel = config.get<string>(`providers.${model.provider}.model`, model.runtimeModel);
+
+  return {
+    env,
+    configOverrides: [],
+    target: {
+      provider: model.provider,
+      transport: model.transport,
+      apiKey,
+      baseUrl,
+      model: providerModel,
+    },
+  };
+}
+
+export function compatibilityProviderOverride(providerId: string, localBaseUrl: string): string {
+  const escapedName = providerId.replace(/[^a-zA-Z0-9_-]/g, "-");
+  return `model_providers.${escapedName}={ name = "Vrompt ${escapedName}", base_url = "${localBaseUrl}", wire_api = "responses" }`;
 }
 
 export function providerEnvKey(provider: ProviderId): string {
