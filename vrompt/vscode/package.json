@@ -12,12 +12,31 @@
     "Other"
   ],
   "activationEvents": [
+    "onView:vrompt.agentView",
     "onCommand:vrompt.open",
     "onCommand:vrompt.selectModel",
     "onCommand:vrompt.configureProvider"
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vrompt",
+          "title": "Vrompt",
+          "icon": "media/vrompt.svg"
+        }
+      ]
+    },
+    "views": {
+      "vrompt": [
+        {
+          "type": "webview",
+          "id": "vrompt.agentView",
+          "name": "Coding Agent"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "vrompt.open",
