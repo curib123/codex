@@ -19,12 +19,16 @@ const PROVIDER_ENV_KEYS: Record<ProviderId, string> = {
   anthropic: "ANTHROPIC_API_KEY",
   mistral: "MISTRAL_API_KEY",
   zai: "ZAI_API_KEY",
+  google: "GEMINI_API_KEY",
+  groq: "GROQ_API_KEY",
 };
 
 const DEFAULT_BASE_URLS: Record<Exclude<ProviderId, "openai">, string> = {
   anthropic: "https://api.anthropic.com",
   mistral: "https://api.mistral.ai/v1",
   zai: "https://api.z.ai/api/paas/v4",
+  google: "https://generativelanguage.googleapis.com/v1beta/openai",
+  groq: "https://api.groq.com/openai/v1",
 };
 
 export async function buildProviderRuntimeConfig(
