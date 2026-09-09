@@ -81,8 +81,8 @@
         },
         "vrompt.providers.mistral.model": {
           "type": "string",
-          "default": "mistral-medium-3-5",
-          "description": "Mistral model identifier used by Vrompt."
+          "default": "",
+          "description": "Optional Mistral model override. Leave blank to use the selected Vrompt model."
         },
         "vrompt.providers.zai.baseUrl": {
           "type": "string",
@@ -91,8 +91,28 @@
         },
         "vrompt.providers.zai.model": {
           "type": "string",
-          "default": "glm-5.3",
-          "description": "Z.ai/GLM model identifier used by Vrompt."
+          "default": "",
+          "description": "Optional Z.ai model override. Leave blank to use the selected Vrompt model."
+        },
+        "vrompt.providers.google.baseUrl": {
+          "type": "string",
+          "default": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "description": "Google Gemini OpenAI-compatible API base URL."
+        },
+        "vrompt.providers.google.model": {
+          "type": "string",
+          "default": "",
+          "description": "Optional Gemini model override. Leave blank to use the selected Vrompt model."
+        },
+        "vrompt.providers.groq.baseUrl": {
+          "type": "string",
+          "default": "https://api.groq.com/openai/v1",
+          "description": "Groq OpenAI-compatible API base URL."
+        },
+        "vrompt.providers.groq.model": {
+          "type": "string",
+          "default": "",
+          "description": "Optional Groq model override. Leave blank to use the selected Vrompt model."
         }
       }
     }
