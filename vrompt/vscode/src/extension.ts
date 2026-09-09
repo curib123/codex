@@ -1,11 +1,13 @@
 import * as vscode from "vscode";
 import { VromptAgentSession } from "./appServer";
+import { VromptCompatibilityServer } from "./compatServer";
 import { AUTO_MODEL_ID, MODELS, type ProviderId } from "./models";
-import { buildProviderRuntimeConfig } from "./providers";
+import { buildProviderRuntimeConfig, compatibilityProviderOverride } from "./providers";
 import { routeModel } from "./routing";
 import { ProviderSecretStore } from "./secrets";
 
 let activeSession: VromptAgentSession | undefined;
+let compatibilityServer: VromptCompatibilityServer | undefined;
 
 export function activate(context: vscode.ExtensionContext): void {
   const secrets = new ProviderSecretStore(context.secrets);
@@ -22,30 +24,31 @@ export function activate(context: vscode.ExtensionContext): void {
     const config = vscode.workspace.getConfiguration("vrompt");
     const selectedModelId = config.get<string>("modelSelection", AUTO_MODEL_ID);
     const availableProviders = await secrets.configuredProviders();
+    // Native Codex authentication can be available even without a separately stored
+    // OpenAI API key, so keep OpenAI eligible as the safe Auto fallback.
     if (!availableProviders.includes("openai")) availableProviders.push("openai");
 
     const decision = routeModel({ prompt, selectedModelId, availableProviders });
-    if (decision.model.transport !== "responses") {
-      await vscode.window.showWarningMessage(
-        `${decision.model.displayName} is registered, but its Vrompt transport adapter is not active yet. Falling back to OpenAI/Codex for this turn.`,
-      );
-    }
-
-    const runtimeModel =
-      decision.model.transport === "responses"
-        ? decision.model
-        : MODELS.find((model) => model.provider === "openai");
-    if (!runtimeModel) throw new Error("OpenAI fallback model is missing from Vrompt registry.");
-
-    const providerConfig = await buildProviderRuntimeConfig(runtimeModel.provider, secrets);
+    const runtimeModel = decision.model;
     const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     const codexBinary = config.get<string>("codexBinary", "codex");
 
     activeSession?.dispose();
-    activeSession = new VromptAgentSession();
-    context.subscriptions.push(activeSession);
+    activeSession = undefined;
+    compatibilityServer?.dispose();
+    compatibilityServer = undefined;
 
     try {
+      const providerConfig = await buildProviderRuntimeConfig(runtimeModel, secrets);
+      if (providerConfig.target) {
+        compatibilityServer = new VromptCompatibilityServer();
+        const localBaseUrl = await compatibilityServer.start(providerConfig.target);
+        providerConfig.configOverrides.push(
+          compatibilityProviderOverride(runtimeModel.runtimeProvider!, localBaseUrl),
+        );
+      }
+
+      activeSession = new VromptAgentSession();
       await activeSession.start({
         codexBinary,
         workspacePath,
@@ -56,11 +59,15 @@ export function activate(context: vscode.ExtensionContext): void {
       });
       const turnId = await activeSession.sendPrompt(prompt, runtimeModel);
       await vscode.window.showInformationMessage(
-        `Vrompt started turn ${turnId.slice(0, 8)} using ${runtimeModel.displayName}.`,
+        `Vrompt started turn ${turnId.slice(0, 8)} using ${runtimeModel.displayName} (${decision.reason}).`,
       );
     } catch (error) {
+      activeSession?.dispose();
+      activeSession = undefined;
+      compatibilityServer?.dispose();
+      compatibilityServer = undefined;
       await vscode.window.showErrorMessage(
-        `Vrompt could not start Codex app-server: ${error instanceof Error ? error.message : String(error)}`,
+        `Vrompt could not start: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   });
@@ -117,10 +124,17 @@ export function activate(context: vscode.ExtensionContext): void {
     },
   );
 
-  context.subscriptions.push(open, selectModel, configureProvider);
+  context.subscriptions.push(open, selectModel, configureProvider, {
+    dispose: () => {
+      activeSession?.dispose();
+      compatibilityServer?.dispose();
+    },
+  });
 }
 
 export function deactivate(): void {
   activeSession?.dispose();
   activeSession = undefined;
+  compatibilityServer?.dispose();
+  compatibilityServer = undefined;
 }
