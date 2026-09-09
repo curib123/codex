@@ -17,7 +17,14 @@ export function activate(context: vscode.ExtensionContext): void {
   const secrets = new ProviderSecretStore(context.secrets);
 
   const configureProvider = async (provider?: ProviderId): Promise<void> => {
-    const providers: ProviderId[] = ["openai", "anthropic", "mistral", "zai"];
+    const providers: ProviderId[] = [
+      "openai",
+      "anthropic",
+      "mistral",
+      "zai",
+      "google",
+      "groq",
+    ];
     const picked =
       provider ??
       ((await vscode.window.showQuickPick(providers, {
@@ -114,7 +121,10 @@ export function activate(context: vscode.ExtensionContext): void {
       },
       ...MODELS.map((model) => ({
         label: model.displayName,
-        description: current === model.id ? "Current selection" : model.provider,
+        description:
+          current === model.id
+            ? "Current selection"
+            : `${model.provider} • ${model.costClass === "free-tier" ? "free tier" : model.costClass}`,
         detail: `${model.taskClass} • ${model.transport} • tools: ${model.supportsTools ? "yes" : "no"}`,
         modelId: model.id,
       })),
