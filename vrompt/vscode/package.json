@@ -1,0 +1,49 @@
+{
+  "name": "vrompt-coding-agent",
+  "displayName": "Vrompt — Coding Agent",
+  "description": "One coding agent. Multiple AI models.",
+  "version": "0.0.1",
+  "private": true,
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Machine Learning",
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:vrompt.open"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vrompt.open",
+        "title": "Vrompt: Open Coding Agent"
+      },
+      {
+        "command": "vrompt.selectModel",
+        "title": "Vrompt: Select Model"
+      }
+    ],
+    "configuration": {
+      "title": "Vrompt",
+      "properties": {
+        "vrompt.modelSelection": {
+          "type": "string",
+          "default": "auto",
+          "description": "Model selection mode or model identifier. Use auto for Auto — Recommended."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "typecheck": "tsc -p . --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.95.0",
+    "typescript": "^5.7.0"
+  }
+}
