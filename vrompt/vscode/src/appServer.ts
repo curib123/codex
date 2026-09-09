@@ -45,7 +45,6 @@ export class VromptAgentSession implements vscode.Disposable {
       approvalPolicy: "on-request",
       sandbox: "workspace-write",
       ephemeral: false,
-      sessionStartSource: "vscode",
     };
 
     if (options.model?.runtimeModel) startParams.model = options.model.runtimeModel;
@@ -88,9 +87,8 @@ export class VromptAgentSession implements vscode.Disposable {
       return;
     }
 
-    // Unknown requests must never be auto-approved. Returning an empty object is
-    // intentionally conservative until Vrompt has a dedicated handler for them.
-    this.rpc.respond(request.id, {});
+    // Never silently approve or fabricate responses for new app-server request types.
+    this.rpc.respondError(request.id, -32601, `Vrompt does not handle ${request.method} yet.`);
   }
 }
 
