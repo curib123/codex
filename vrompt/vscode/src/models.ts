@@ -1,6 +1,7 @@
 export type ProviderId = "openai" | "anthropic" | "mistral" | "zai";
 
 export type TaskClass = "light" | "standard" | "complex";
+export type ProviderTransport = "responses" | "chat-compat" | "anthropic-messages";
 
 export interface ModelDefinition {
   id: string;
@@ -10,17 +11,22 @@ export interface ModelDefinition {
   supportsTools: boolean;
   supportsVision: boolean;
   supportsReasoning: boolean;
+  runtimeProvider?: string;
+  runtimeModel?: string;
+  transport: ProviderTransport;
 }
 
 export const MODELS: readonly ModelDefinition[] = [
   {
     id: "openai/default",
     provider: "openai",
-    displayName: "OpenAI — Default",
+    displayName: "OpenAI — Codex default",
     taskClass: "complex",
     supportsTools: true,
     supportsVision: true,
     supportsReasoning: true,
+    runtimeProvider: "openai",
+    transport: "responses",
   },
   {
     id: "anthropic/default",
@@ -30,6 +36,7 @@ export const MODELS: readonly ModelDefinition[] = [
     supportsTools: true,
     supportsVision: true,
     supportsReasoning: true,
+    transport: "anthropic-messages",
   },
   {
     id: "mistral/default",
@@ -39,6 +46,7 @@ export const MODELS: readonly ModelDefinition[] = [
     supportsTools: true,
     supportsVision: true,
     supportsReasoning: true,
+    transport: "chat-compat",
   },
   {
     id: "zai/default",
@@ -48,6 +56,7 @@ export const MODELS: readonly ModelDefinition[] = [
     supportsTools: true,
     supportsVision: true,
     supportsReasoning: true,
+    transport: "chat-compat",
   },
 ] as const;
 
