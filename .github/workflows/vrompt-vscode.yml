@@ -1,0 +1,34 @@
+name: Vrompt VS Code
+
+on:
+  push:
+    branches:
+      - "vrompt/**"
+  pull_request:
+    paths:
+      - "vrompt/vscode/**"
+      - ".github/workflows/vrompt-vscode.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  typecheck:
+    name: Typecheck VS Code extension
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: vrompt/vscode
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Build
+        run: npm run build

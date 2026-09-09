@@ -1,0 +1,137 @@
+{
+  "name": "vrompt-coding-agent",
+  "displayName": "Vrompt — Coding Agent",
+  "description": "One coding agent. Multiple AI models.",
+  "version": "0.0.1",
+  "publisher": "curib123",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/curib123/vrompt-coding-agent.git"
+  },
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Machine Learning",
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:vrompt.agentView",
+    "onCommand:vrompt.open",
+    "onCommand:vrompt.selectModel",
+    "onCommand:vrompt.configureProvider"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vrompt",
+          "title": "Vrompt",
+          "icon": "media/vrompt.svg"
+        }
+      ]
+    },
+    "views": {
+      "vrompt": [
+        {
+          "type": "webview",
+          "id": "vrompt.agentView",
+          "name": "Coding Agent"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "vrompt.open",
+        "title": "Vrompt: Open Coding Agent"
+      },
+      {
+        "command": "vrompt.selectModel",
+        "title": "Vrompt: Select Model"
+      },
+      {
+        "command": "vrompt.configureProvider",
+        "title": "Vrompt: Configure AI Provider"
+      }
+    ],
+    "configuration": {
+      "title": "Vrompt",
+      "properties": {
+        "vrompt.modelSelection": {
+          "type": "string",
+          "default": "auto",
+          "description": "Model selection mode or model identifier. Use auto for Auto — Recommended."
+        },
+        "vrompt.codexBinary": {
+          "type": "string",
+          "default": "codex",
+          "description": "Path or command name for the Codex runtime used by Vrompt app-server."
+        },
+        "vrompt.providers.anthropic.baseUrl": {
+          "type": "string",
+          "default": "https://api.anthropic.com",
+          "description": "Anthropic API base URL used by the Vrompt compatibility bridge."
+        },
+        "vrompt.providers.anthropic.model": {
+          "type": "string",
+          "default": "claude-sonnet-5",
+          "description": "Anthropic model identifier used by Vrompt."
+        },
+        "vrompt.providers.mistral.baseUrl": {
+          "type": "string",
+          "default": "https://api.mistral.ai/v1",
+          "description": "Mistral API base URL used by the Vrompt compatibility bridge."
+        },
+        "vrompt.providers.mistral.model": {
+          "type": "string",
+          "default": "",
+          "description": "Optional Mistral model override. Leave blank to use the selected Vrompt model."
+        },
+        "vrompt.providers.zai.baseUrl": {
+          "type": "string",
+          "default": "https://api.z.ai/api/paas/v4",
+          "description": "Z.ai API base URL. GLM Coding Plan users can set the coding endpoint instead."
+        },
+        "vrompt.providers.zai.model": {
+          "type": "string",
+          "default": "",
+          "description": "Optional Z.ai model override. Leave blank to use the selected Vrompt model."
+        },
+        "vrompt.providers.google.baseUrl": {
+          "type": "string",
+          "default": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "description": "Google Gemini OpenAI-compatible API base URL."
+        },
+        "vrompt.providers.google.model": {
+          "type": "string",
+          "default": "",
+          "description": "Optional Gemini model override. Leave blank to use the selected Vrompt model."
+        },
+        "vrompt.providers.groq.baseUrl": {
+          "type": "string",
+          "default": "https://api.groq.com/openai/v1",
+          "description": "Groq OpenAI-compatible API base URL."
+        },
+        "vrompt.providers.groq.model": {
+          "type": "string",
+          "default": "",
+          "description": "Optional Groq model override. Leave blank to use the selected Vrompt model."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "typecheck": "tsc -p . --noEmit",
+    "vscode:prepublish": "npm run build",
+    "package:vsix": "vsce package --out vrompt-coding-agent-0.0.1.vsix"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.95.0",
+    "@vscode/vsce": "^3.6.2",
+    "typescript": "^5.7.0"
+  }
+}
