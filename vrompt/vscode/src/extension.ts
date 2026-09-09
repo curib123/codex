@@ -108,18 +108,19 @@ export function activate(context: vscode.ExtensionContext): void {
         placeHolder: "Choose a provider",
       });
       if (!picked) return;
+      const provider = picked as ProviderId;
 
       const apiKey = await vscode.window.showInputBox({
-        title: `Vrompt — ${picked} API key`,
+        title: `Vrompt — ${provider} API key`,
         password: true,
         ignoreFocusOut: true,
         prompt: "Stored securely using VS Code SecretStorage. Leave blank to remove the saved key.",
       });
       if (apiKey === undefined) return;
 
-      await secrets.set(picked, apiKey);
+      await secrets.set(provider, apiKey);
       await vscode.window.showInformationMessage(
-        apiKey.trim() ? `${picked} credentials saved securely.` : `${picked} credentials removed.`,
+        apiKey.trim() ? `${provider} credentials saved securely.` : `${provider} credentials removed.`,
       );
     },
   );
