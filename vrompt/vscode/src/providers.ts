@@ -55,7 +55,8 @@ export async function buildProviderRuntimeConfig(
     `providers.${model.provider}.baseUrl`,
     DEFAULT_BASE_URLS[model.provider],
   );
-  const providerModel = config.get<string>(`providers.${model.provider}.model`, model.runtimeModel);
+  const configuredModel = config.get<string>(`providers.${model.provider}.model`, "").trim();
+  const providerModel = configuredModel || model.runtimeModel;
 
   return {
     env,
