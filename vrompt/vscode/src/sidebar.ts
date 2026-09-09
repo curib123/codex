@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import type { VromptAgentSession, AgentEvent } from "./appServer";
-import { AUTO_MODEL_ID, MODELS, type ModelDefinition, type ProviderId } from "./models";
+import { AUTO_MODEL_ID, MODELS, type ProviderId } from "./models";
 
 export interface SidebarController {
   sendPrompt(prompt: string): Promise<void>;
@@ -50,10 +50,6 @@ export class VromptSidebarProvider implements vscode.WebviewViewProvider, vscode
     );
 
     this.post({ type: "model", modelId: this.controller.getCurrentModelId() });
-  }
-
-  reveal(): void {
-    this.view?.show?.(true);
   }
 
   bindSession(session: VromptAgentSession): vscode.Disposable {
@@ -204,6 +200,8 @@ export class VromptSidebarProvider implements vscode.WebviewViewProvider, vscode
     if (id.startsWith('anthropic/')) providerId = 'anthropic';
     else if (id.startsWith('mistral/')) providerId = 'mistral';
     else if (id.startsWith('zai/')) providerId = 'zai';
+    else if (id.startsWith('google/')) providerId = 'google';
+    else if (id.startsWith('groq/')) providerId = 'groq';
     vscode.postMessage({ type: 'configureProvider', provider: providerId });
   });
 
