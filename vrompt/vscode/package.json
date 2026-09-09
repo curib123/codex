@@ -3,7 +3,12 @@
   "displayName": "Vrompt — Coding Agent",
   "description": "One coding agent. Multiple AI models.",
   "version": "0.0.1",
+  "publisher": "curib123",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/curib123/vrompt-coding-agent.git"
+  },
   "engines": {
     "vscode": "^1.95.0"
   },
@@ -119,11 +124,14 @@
   },
   "scripts": {
     "build": "tsc -p .",
-    "typecheck": "tsc -p . --noEmit"
+    "typecheck": "tsc -p . --noEmit",
+    "vscode:prepublish": "npm run build",
+    "package:vsix": "vsce package --out vrompt-coding-agent-0.0.1.vsix"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/vscode": "^1.95.0",
+    "@vscode/vsce": "^3.6.2",
     "typescript": "^5.7.0"
   }
 }
