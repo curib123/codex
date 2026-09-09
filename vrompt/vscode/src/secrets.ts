@@ -6,6 +6,8 @@ const SECRET_KEYS: Record<ProviderId, string> = {
   anthropic: "vrompt.provider.anthropic.apiKey",
   mistral: "vrompt.provider.mistral.apiKey",
   zai: "vrompt.provider.zai.apiKey",
+  google: "vrompt.provider.google.apiKey",
+  groq: "vrompt.provider.groq.apiKey",
 };
 
 export class ProviderSecretStore {
