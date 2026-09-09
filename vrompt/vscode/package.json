@@ -12,7 +12,9 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:vrompt.open"
+    "onCommand:vrompt.open",
+    "onCommand:vrompt.selectModel",
+    "onCommand:vrompt.configureProvider"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -24,6 +26,10 @@
       {
         "command": "vrompt.selectModel",
         "title": "Vrompt: Select Model"
+      },
+      {
+        "command": "vrompt.configureProvider",
+        "title": "Vrompt: Configure AI Provider"
       }
     ],
     "configuration": {
@@ -33,6 +39,11 @@
           "type": "string",
           "default": "auto",
           "description": "Model selection mode or model identifier. Use auto for Auto — Recommended."
+        },
+        "vrompt.codexBinary": {
+          "type": "string",
+          "default": "codex",
+          "description": "Path or command name for the Codex runtime used by Vrompt app-server."
         }
       }
     }
