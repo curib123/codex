@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Vrompt: Build Extension",
+      "type": "shell",
+      "command": "npm run build",
+      "problemMatcher": "$tsc",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
